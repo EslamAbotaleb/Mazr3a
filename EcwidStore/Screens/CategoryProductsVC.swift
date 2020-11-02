@@ -16,15 +16,15 @@ class CategoryProductsVC: DataLoadingVC {
     var sortProductTextField = UITextField()
     var pickerViewSortProduct = ToolbarPickerView()
     var collectionView:UICollectionView!
-    
+    let searchView = SearchView()
     var items = [PItem]()
-    var currentCart =  [CartModel]()
+    var productCartModel =  [CartModel]()
 
     var category:StoreCategory?
     var productsIDs:[Int] = [Int]()
     var viewIsSelected: Bool = false
 
-    var sortByArray = ["NAME_ASC","NAME_DESC","PRICE_ASC","PRICE_DESC"]
+    var nameSortingProductBy = ["NAME_ASC","NAME_DESC","PRICE_ASC","PRICE_DESC"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -158,6 +158,7 @@ class CategoryProductsVC: DataLoadingVC {
         dismiss(animated: true)
         
     }
+    
     //MARK: check if product in cart section
     func checkIfCarted (cartItemId : Int) -> Bool {
         if let data = UserDefaults.standard.data(forKey: "ItemInCartSection"),
@@ -166,16 +167,14 @@ class CategoryProductsVC: DataLoadingVC {
             for item in cartuseritem {
                 
                 if   item.id == "\(cartItemId)" {
-                    
                     return true
-                    
                 }
-                
             }
             
         }
         return false
     }
+    
     //MARK:- Add product in cart
     @objc func addProductInCart(_ sender: UIButton) {
         let productItem = self.items[sender.tag]
@@ -194,10 +193,10 @@ class CategoryProductsVC: DataLoadingVC {
             if let dataItemsInCart = UserDefaults.standard.data(forKey: "ItemInCartSection"),
                let itemInCart = NSKeyedUnarchiver.unarchiveObject(with: dataItemsInCart) as? [CartModel]
                {
-                currentCart = itemInCart as [CartModel]
-                currentCart.append(CartModel(CartName: productItem.name!, Cartid: "\(productItem.id)", CartdefaultDisplayedPriceFormatted: productItem.defaultDisplayedPriceFormatted!, Cartweight: productItem.weight!, Cartenabled: productItem.enabled, CartitemDescription: productItem.itemDescription!, CartimageURL: productItem.imageURL!, CartinStock: productItem.inStock!, CartdiscountsAllowed: productItem.discountsAllowed!))
+                productCartModel = itemInCart as [CartModel]
+                productCartModel.append(CartModel(CartName: productItem.name!, Cartid: "\(productItem.id)", CartdefaultDisplayedPriceFormatted: productItem.defaultDisplayedPriceFormatted!, Cartweight: productItem.weight!, Cartenabled: productItem.enabled, CartitemDescription: productItem.itemDescription!, CartimageURL: productItem.imageURL!, CartinStock: productItem.inStock!, CartdiscountsAllowed: productItem.discountsAllowed!))
                 
-                let data = NSKeyedArchiver.archivedData(withRootObject: currentCart)
+                let data = NSKeyedArchiver.archivedData(withRootObject: productCartModel)
                 
                 
                 UserDefaults.standard.set(data, forKey: "ItemInCartSection")
@@ -205,14 +204,16 @@ class CategoryProductsVC: DataLoadingVC {
                 UserDefaults.standard.synchronize()
                 
             } else {
-                currentCart.append(CartModel(CartName: productItem.name!, Cartid: "\(productItem.id)", CartdefaultDisplayedPriceFormatted: productItem.defaultDisplayedPriceFormatted!, Cartweight: productItem.weight!, Cartenabled: productItem.enabled, CartitemDescription: productItem.itemDescription!, CartimageURL: productItem.imageURL!, CartinStock: productItem.inStock!, CartdiscountsAllowed: productItem.discountsAllowed!))
-                let data = NSKeyedArchiver.archivedData(withRootObject: currentCart)
+                productCartModel.append(CartModel(CartName: productItem.name!, Cartid: "\(productItem.id)", CartdefaultDisplayedPriceFormatted: productItem.defaultDisplayedPriceFormatted!, Cartweight: productItem.weight!, Cartenabled: productItem.enabled, CartitemDescription: productItem.itemDescription!, CartimageURL: productItem.imageURL!, CartinStock: productItem.inStock!, CartdiscountsAllowed: productItem.discountsAllowed!))
+                let data = NSKeyedArchiver.archivedData(withRootObject: productCartModel)
                 
                 
                 UserDefaults.standard.set(data, forKey: "ItemInCartSection")
                 
                 UserDefaults.standard.synchronize()
             }
+            searchView.cardButton.badgeString = "\(productCartModel.count)"
+
         } else {
             sender.isSelected = false
             let defaults = UserDefaults.standard
@@ -225,13 +226,13 @@ class CategoryProductsVC: DataLoadingVC {
             // this part to remove part
             if let dataItemsInCart = UserDefaults.standard.data(forKey: "ItemInCartSection") {
                 
-                currentCart = (NSKeyedUnarchiver.unarchiveObject(with: dataItemsInCart) as? [CartModel])!
+                productCartModel = (NSKeyedUnarchiver.unarchiveObject(with: dataItemsInCart) as? [CartModel])!
                 let objectCartModel = CartModel(CartName: productItem.name!, Cartid: "\(productItem.id)", CartdefaultDisplayedPriceFormatted: productItem.defaultDisplayedPriceFormatted!, Cartweight: productItem.weight!, Cartenabled: productItem.enabled, CartitemDescription: productItem.itemDescription!, CartimageURL: productItem.imageURL!, CartinStock: productItem.inStock!, CartdiscountsAllowed: productItem.discountsAllowed!)
                 
-                for(key,value) in currentCart.enumerated() {
+                for(key,value) in productCartModel.enumerated() {
                     if objectCartModel.id == value.id {
-                        currentCart.remove(at: Int(key))
-                        let data = NSKeyedArchiver.archivedData(withRootObject: currentCart)
+                        productCartModel.remove(at: Int(key))
+                        let data = NSKeyedArchiver.archivedData(withRootObject: productCartModel)
  
                         UserDefaults.standard.set(data, forKey: "ItemInCartSection")
                         
@@ -240,9 +241,12 @@ class CategoryProductsVC: DataLoadingVC {
                     }
                 }
             }
+            searchView.cardButton.badgeString = "\(productCartModel.count - 1)"
+
         }
     }
 }
+//MARK:- collectionview
 extension CategoryProductsVC: UICollectionViewDelegate , UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         self.items.count
@@ -284,7 +288,6 @@ extension CategoryProductsVC: UICollectionViewDelegate , UICollectionViewDataSou
                         cell.addToCardButton.backgroundColor = .white
                         cell.addToCardButton.layer.borderWidth = 1
                         cell.addToCardButton.layer.borderColor = UIColor.lightGray.cgColor
-                        cell.addToCardButton.translatesAutoresizingMaskIntoConstraints = false
                             
                     }
                 }
@@ -314,32 +317,33 @@ extension CategoryProductsVC: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return self.sortByArray.count
+        return self.nameSortingProductBy.count
     }
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == self.pickerViewSortProduct {
-            return self.sortByArray[row]
+            return self.nameSortingProductBy[row]
         }
         return ""
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if pickerView == pickerViewSortProduct {
-            self.sortProductTextField.text = self.sortByArray[row]
+            self.sortProductTextField.text = self.nameSortingProductBy[row]
         }
     }
 }
 
+// MARK:- select row from pickerview
 extension CategoryProductsVC: ToolbarPickerViewDelegate {
     func didTapDone() {
         let row = self.pickerViewSortProduct.selectedRow(inComponent: 0)
         self.pickerViewSortProduct.selectRow(row, inComponent: 0, animated: false)
-        self.sortProductTextField.text = self.sortByArray[row]
+        self.sortProductTextField.text = self.nameSortingProductBy[row]
         self.sortProductTextField.resignFirstResponder()
         if self.productsIDs.count > 0 {
         items.removeAll()
         self.collectionView.reloadDataOnMainThread()
         showLoadingView()
-            StoreClient.shared.getProductBySorting(sortBy: self.sortByArray[row]) { (result) in
+            StoreClient.shared.getProductBySorting(sortBy: self.nameSortingProductBy[row]) { (result) in
             switch result {
             case .failure(let error):
                 print(error)

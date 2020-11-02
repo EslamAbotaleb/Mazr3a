@@ -21,50 +21,43 @@ class CategoriesVC: DataLoadingVC {
     var completePayButton = UIButton()
     var viewPrice = UIView()
     var subViewPrice = UIView()
-    var currentCart =  [CartModel]()
+    var productCartModel =  [CartModel]()
     var totalPrice: Double = 0.00
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("thisiscallledforcheckout\(self.currentCart.count)")
         view.backgroundColor = .white
-        if (self.currentCart.count == 0) {
-            setupView()
-        } else {
+        retrieveProductsInCart()
             setupCollectionView()
             setStaticTitle()
             setupButton()
             setupViewPrice()
             setupStackView()
-            
             layoutUI()
+        
+        // get all data from cart
+        for (_, value) in self.productCartModel.enumerated() {
+            
+            totalPrice += Double(value.defaultDisplayedPriceFormatted.replacingOccurrences(of: "EGP ", with: ""))!
+            totalPriceLabel(getTotalPrice: "\(totalPrice) EGP")
+
         }
-       
-        
-        
-        // getting all data for cart
-        
+    
 
     }
     func setupView() {
         self.view.backgroundColor = UIColor.white
     }
     var heightCollectionView: CGFloat = 0.0
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if (self.currentCart.count == 0) {
-            
-        } else {
-            self.collectionView.reloadDataOnMainThread()
-            self.mainTitle.text = "سله المشتريات"
-            guard  let getallitemsdata = UserDefaults.standard.data(forKey: "ItemInCartSection")
-            
-            else {return}
-            
-            currentCart  = (NSKeyedUnarchiver.unarchiveObject(with: getallitemsdata as Data) as? [CartModel])!
-            heightCollectionView = CGFloat(100.0 * CGFloat(currentCart.count))
-            print(heightCollectionView)
-        }
         
+
+            self.mainTitle.text = "سله المشتريات"
+            retrieveProductsInCart()
+            print(heightCollectionView)
+        self.collectionView.reloadDataOnMainThread()
+
         
     }
     
@@ -77,6 +70,11 @@ class CategoriesVC: DataLoadingVC {
         collectionView.delegate = self
     }
     func setupButton() {
+        if(self.productCartModel.count == 0 ) {
+            completePayButton.isHidden = true
+        } else {
+            completePayButton.isHidden = false
+        }
         completePayButton.setTitle("استمر في عمليه الشراء", for: .normal)
         completePayButton.titleLabel?.numberOfLines = 2
         completePayButton.titleLabel?.textAlignment = .center
@@ -89,9 +87,7 @@ class CategoriesVC: DataLoadingVC {
     
     func setupStackView() {
         
-        
-        
-        stackView   = UIStackView()
+        stackView  = UIStackView()
         stackView.axis  = NSLayoutConstraint.Axis.horizontal
         stackView.distribution  = UIStackView.Distribution.fillEqually
         stackView.alignment = UIStackView.Alignment.center
@@ -113,7 +109,11 @@ class CategoriesVC: DataLoadingVC {
         mainTitle.textAlignment = .left
         mainTitle.numberOfLines = 2
         mainTitle.translatesAutoresizingMaskIntoConstraints = false
-        
+        if( self.productCartModel.count == 0 ) {
+            staticLabelSubTotal.isHidden = true
+        } else {
+            staticLabelSubTotal.isHidden = false
+        }
         staticLabelSubTotal.font = UIFont.systemFont(ofSize: 15, weight: .bold)
         staticLabelSubTotal.textColor = .black
         staticLabelSubTotal.textAlignment = .left
@@ -137,12 +137,9 @@ class CategoriesVC: DataLoadingVC {
         view.addSubViews(mainTitle, collectionView, viewPrice)
         viewPrice.addSubViews(subViewPrice, completePayButton)
         subViewPrice.addSubview(stackView)
-        guard  let getallitemsdata = UserDefaults.standard.data(forKey: "ItemInCartSection")
-        
-        else {return}
-        
-        currentCart  = (NSKeyedUnarchiver.unarchiveObject(with: getallitemsdata as Data) as? [CartModel])!
-        heightCollectionView = CGFloat(100.0 * CGFloat(currentCart.count))
+
+        retrieveProductsInCart()
+
         
         NSLayoutConstraint.activate([
             //Title
@@ -157,14 +154,10 @@ class CategoriesVC: DataLoadingVC {
             collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
            
-            viewPrice.topAnchor.constraint(equalTo: collectionView.bottomAnchor,constant: 10.0),
+            viewPrice.topAnchor.constraint(equalTo: collectionView.bottomAnchor,constant: -10.0),
             viewPrice.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             viewPrice.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-//            viewPrice.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            viewPrice.heightAnchor.constraint(equalToConstant: 130.0),
-            //            stackView.topAnchor.constraint(lessThanOrEqualTo: collectionView.bottomAnchor, constant: 0.0),
-            //
-            
+            viewPrice.heightAnchor.constraint(equalToConstant: 130.0),            
             
             subViewPrice.topAnchor.constraint(equalTo: self.viewPrice.topAnchor, constant: 2.0),
             subViewPrice.leftAnchor.constraint(equalTo: self.viewPrice.leftAnchor, constant: 0),
@@ -178,8 +171,8 @@ class CategoriesVC: DataLoadingVC {
             stackView.trailingAnchor.constraint(equalTo: subViewPrice.trailingAnchor, constant: -12.0),
             stackView.bottomAnchor.constraint(equalTo: completePayButton.topAnchor),
             
+        
             
-            //
             completePayButton.leadingAnchor.constraint(equalTo: viewPrice.safeAreaLayoutGuide.leadingAnchor, constant: 12.0),
             completePayButton.trailingAnchor.constraint(equalTo: viewPrice.safeAreaLayoutGuide.trailingAnchor, constant: -12.0),
             completePayButton.bottomAnchor.constraint(equalTo: viewPrice.bottomAnchor, constant:  10.0),
@@ -187,6 +180,16 @@ class CategoriesVC: DataLoadingVC {
             
             
         ])
+    }
+    //MARK:- retrieve products in cart
+    func retrieveProductsInCart() {
+        guard  let getoroductCart = UserDefaults.standard.data(forKey: "ItemInCartSection")
+        
+        else {return}
+        
+        productCartModel  = (NSKeyedUnarchiver.unarchiveObject(with: getoroductCart as Data) as? [CartModel])!
+        heightCollectionView = CGFloat(100.0 * CGFloat(productCartModel.count))
+
     }
     /*
      // MARK: - Navigation
@@ -199,21 +202,19 @@ class CategoriesVC: DataLoadingVC {
      */
     
 }
+
+//MARK:- collectionView spesfic shopping cart
 extension CategoriesVC: UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.currentCart.count
+        return self.productCartModel.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CardCartCell.reuseID, for: indexPath) as! CardCartCell
-        cell.set(with: self.currentCart[indexPath.row])
-        
-        
-        self.totalPrice += Double(self.currentCart[indexPath.row].defaultDisplayedPriceFormatted.replacingOccurrences(of: "EGP ", with: ""))!
-        totalPriceLabel(getTotalPrice: "\(totalPrice) EGP")
+        cell.set(with: self.productCartModel[indexPath.item])
         return cell
     }
     

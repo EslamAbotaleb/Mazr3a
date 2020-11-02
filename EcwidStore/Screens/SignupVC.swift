@@ -39,19 +39,21 @@ class SignupVC: UIViewController {
         signupButton.layer.borderColor = #colorLiteral(red: 0.2274509804, green: 0.5058823529, blue: 0.1137254902, alpha: 1)
      
         signupButton.addTarget(self, action: #selector(authenticationPhoneNumberScreen), for: .touchUpInside)
-//        signupButton.addTarget(self, action: #selector(dismissVC), for: .touchUpInside)
-        signinButton.addTarget(self, action: #selector(dismissVC), for: .touchUpInside)
+        signinButton.addTarget(self, action: #selector(authenticationPhoneNumberScreen), for: .touchUpInside)
     }
     
     @objc func dismissVC(){
         self.dismiss(animated: true)
     }
+    
+    //MARK:- Go to user interface phone number authentication for signup/signin
     @objc func authenticationPhoneNumberScreen() {
-        //MARK:-
+       
         let vc = AuthPhoneNumberRegistration()
          self.present(vc,animated: true)
 
     }
+    
     func layouUI(){
         view.addSubViews(logoImageView,welcomeLable,signinButton,signupButton)
         

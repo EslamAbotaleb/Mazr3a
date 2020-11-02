@@ -9,7 +9,8 @@
 import UIKit
 
 class StoreTabBarController: UITabBarController {
-    
+    var currentCart =  [CartModel]()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         UITabBar.appearance().tintColor = #colorLiteral(red: 0.2274509804, green: 0.5058823529, blue: 0.1137254902, alpha: 1)
@@ -26,6 +27,8 @@ class StoreTabBarController: UITabBarController {
     
     
     func createCategoriesNC() -> UINavigationController {
+         
+      
         let categoriesVC = CategoriesVC()
         categoriesVC.tabBarItem = UITabBarItem(title: "", image: UIImage(named: "SF_cart_fill"), tag: 1)
         return UINavigationController(rootViewController: categoriesVC)

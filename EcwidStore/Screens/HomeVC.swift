@@ -14,7 +14,6 @@ class HomeVC: DataLoadingVC {
     let homeTableView = UITableView()
     let searchView = SearchView()
     var currentCart =  [CartModel]()
-
     var items = [Item]()
     var page = 0
     var offset =  10
@@ -24,7 +23,6 @@ class HomeVC: DataLoadingVC {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        searchView.cardButton.backgroundColor = UIColor.green
         searchView.cardButton.badgeTextColor = UIColor.white
         searchView.cardButton.badgeEdgeInsets = UIEdgeInsets(top: 4, left: 1, bottom: 5, right: 13)
         
@@ -40,17 +38,21 @@ class HomeVC: DataLoadingVC {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-            //checking if the user had something in cart
-        if let getallitemsdata = UserDefaults.standard.data(forKey: "ItemInCartSection") {
-            currentCart = (NSKeyedUnarchiver.unarchiveObject(with: getallitemsdata as Data) as? [CartModel])!
+        checkIfThereProductInCart()
            
-            searchView.cardButton.badgeString = "\(currentCart.count)"
-                      
-                  }else {
-                    searchView.cardButton.badgeString = ""
-                      
-                  }
+    }
+    
+    //checking if the user had something in cart
+    func checkIfThereProductInCart() {
+    if let getallitemsdata = UserDefaults.standard.data(forKey: "ItemInCartSection") {
+        currentCart = (NSKeyedUnarchiver.unarchiveObject(with: getallitemsdata as Data) as? [CartModel])!
+       
+        searchView.cardButton.badgeString = "\(currentCart.count)"
+                  
+              }else {
+                searchView.cardButton.badgeString = ""
+                  
+              }
     }
     func setupHomeTabelView(){
         homeTableView.separatorStyle = .none

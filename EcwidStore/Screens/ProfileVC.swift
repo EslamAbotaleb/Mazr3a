@@ -228,7 +228,7 @@ class ProfileVC: UIViewController {
         }
         UserDefaults.standard.removeObject(forKey: "verifyID")
         UserDefaults.standard.synchronize()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let vc = SignupVC()
              self.present(vc,animated: true)
         }

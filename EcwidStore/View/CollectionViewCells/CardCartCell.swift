@@ -48,6 +48,7 @@ class CardCartCell: UICollectionViewCell {
         priceProductlabel.numberOfLines = 1
         priceProductlabel.translatesAutoresizingMaskIntoConstraints = false
     }
+    
     //MARK:- layout user interface
     private func layoutUI() {
         addSubViews(productImageViewInCart, titleProductlabel, priceProductlabel)

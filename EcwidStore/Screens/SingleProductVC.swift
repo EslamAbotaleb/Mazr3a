@@ -13,7 +13,7 @@ class SingleProductVC: UIViewController {
     let scrollView  = UIScrollView()
     let contentView = UIView()
     var item:PItem!
-    var currentCart: [CartModel]!
+    var productCartModel: [CartModel]!
     
     let searchView = SearchViewWithBackButton()
     let productImageView = UIImageView(image: UIImage(named: "Food"))
@@ -38,9 +38,9 @@ class SingleProductVC: UIViewController {
         
             //checking if the user had something in cart
         if let getallitemsdata = UserDefaults.standard.data(forKey: "ItemInCartSection") {
-            currentCart = (NSKeyedUnarchiver.unarchiveObject(with: getallitemsdata as Data) as? [CartModel])!
+            productCartModel = (NSKeyedUnarchiver.unarchiveObject(with: getallitemsdata as Data) as? [CartModel])!
            
-            searchView.cardButton.badgeString = "\(currentCart.count)"
+            searchView.cardButton.badgeString = "\(productCartModel.count)"
                       
                   }else {
                       
@@ -53,7 +53,7 @@ class SingleProductVC: UIViewController {
         print("this is callled for single product")
         searchView.cardButton.badgeTextColor = UIColor.white
         searchView.cardButton.badgeEdgeInsets = UIEdgeInsets(top: 4, left: 1, bottom: 5, right: 13)
-        currentCart = [CartModel]()
+        productCartModel = [CartModel]()
 
         configureScrollView()
         setupLabels()
@@ -61,6 +61,32 @@ class SingleProductVC: UIViewController {
         configureStackView()
         layoutUI()
         configureActionButton()
+        // MARK:- display products in cart
+        getProductsInCart()
+        let tapGestureRecognizer2 = UITapGestureRecognizer(target: self, action: #selector(CartimageTapped(tapGestureRecognizer:)))
+        cardButton.isUserInteractionEnabled = true
+        cardButton.addGestureRecognizer(tapGestureRecognizer2)
+        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.productImageView.downloadImage(fromURL: item.imageURL ?? "")
+        self.codeLabel.text = "Code:\(item.id)"
+        self.nameLabel.text = item.name ?? ""
+        self.descriptionLabel.text = Helpers.handleDescriptionString(description: item.itemDescription ?? "")
+        self.priceLabel.text = item.defaultDisplayedPriceFormatted
+        if !(item.discountsAllowed ?? false)  {
+            self.promoLabel.text = "No Discount 😟"
+        }
+    }
+    // get all products in cart section
+    func getProductsInCart() {
         if let getallitemsdata = UserDefaults.standard.data(forKey: "ItemInCartSection") {
             
             
@@ -90,29 +116,7 @@ class SingleProductVC: UIViewController {
                     
             }
         }
-        let tapGestureRecognizer2 = UITapGestureRecognizer(target: self, action: #selector(CartimageTapped(tapGestureRecognizer:)))
-        cardButton.isUserInteractionEnabled = true
-        cardButton.addGestureRecognizer(tapGestureRecognizer2)
-        
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.productImageView.downloadImage(fromURL: item.imageURL ?? "")
-        self.codeLabel.text = "Code:\(item.id)"
-        self.nameLabel.text = item.name ?? ""
-        self.descriptionLabel.text = Helpers.handleDescriptionString(description: item.itemDescription ?? "")
-        self.priceLabel.text = item.defaultDisplayedPriceFormatted
-        if !(item.discountsAllowed ?? false)  {
-            self.promoLabel.text = "No Discount 😟"
-        }
-    }
-    
     func configureScrollView(){
         view.addSubViews(searchView,scrollView)
         scrollView.addSubview(contentView)
@@ -299,10 +303,9 @@ class SingleProductVC: UIViewController {
         cartItem(self.cardButton)
     }
     
-    
+    //MARK:- Action cart product
     @IBAction func cartItem(_ sender: UIButton) {
         
-  
         if !checkIfCarted(cartItemId: item.id)  {
             sender.isSelected = true
             let defults = UserDefaults.standard
@@ -318,26 +321,26 @@ class SingleProductVC: UIViewController {
 
                let cartuseritem = NSKeyedUnarchiver.unarchiveObject(with: data) as? [CartModel] {
                 
-                currentCart = cartuseritem as [CartModel]
+                productCartModel = cartuseritem as [CartModel]
                 
-                currentCart.append(CartModel(CartName: item.name!, Cartid: "\(item.id)", CartdefaultDisplayedPriceFormatted: item.defaultDisplayedPriceFormatted!, Cartweight: item.weight!, Cartenabled: item.enabled, CartitemDescription: item.itemDescription!, CartimageURL: item.imageURL!, CartinStock: item.inStock!, CartdiscountsAllowed: item.discountsAllowed!))
+                productCartModel.append(CartModel(CartName: item.name!, Cartid: "\(item.id)", CartdefaultDisplayedPriceFormatted: item.defaultDisplayedPriceFormatted!, Cartweight: item.weight!, Cartenabled: item.enabled, CartitemDescription: item.itemDescription!, CartimageURL: item.imageURL!, CartinStock: item.inStock!, CartdiscountsAllowed: item.discountsAllowed!))
 
-                let data = NSKeyedArchiver.archivedData(withRootObject: currentCart!)
+                let data = NSKeyedArchiver.archivedData(withRootObject: productCartModel!)
                 
                 UserDefaults.standard.set(data, forKey: "ItemInCartSection")
                 
                 UserDefaults.standard.synchronize()
 
             } else {
-                currentCart.append(CartModel(CartName: item.name!, Cartid: "\(item.id)", CartdefaultDisplayedPriceFormatted: item.defaultDisplayedPriceFormatted!, Cartweight: item.weight!, Cartenabled: item.enabled, CartitemDescription: item.itemDescription!, CartimageURL: item.imageURL!, CartinStock: item.inStock!, CartdiscountsAllowed: item.discountsAllowed!))
-                let data = NSKeyedArchiver.archivedData(withRootObject: currentCart!)
+                productCartModel.append(CartModel(CartName: item.name!, Cartid: "\(item.id)", CartdefaultDisplayedPriceFormatted: item.defaultDisplayedPriceFormatted!, Cartweight: item.weight!, Cartenabled: item.enabled, CartitemDescription: item.itemDescription!, CartimageURL: item.imageURL!, CartinStock: item.inStock!, CartdiscountsAllowed: item.discountsAllowed!))
+                let data = NSKeyedArchiver.archivedData(withRootObject: productCartModel!)
                 
                 
                 UserDefaults.standard.set(data, forKey: "ItemInCartSection")
                 
                 UserDefaults.standard.synchronize()
             }
-            searchView.cardButton.badgeString = "\(currentCart.count)"
+            searchView.cardButton.badgeString = "\(productCartModel.count)"
 
         } else {
             sender.isSelected = false
@@ -347,11 +350,11 @@ class SingleProductVC: UIViewController {
             defults.set(false, forKey: "isSelectedCartdetailotherproductitem\(sender.tag)")
             
             if let data = UserDefaults.standard.data(forKey: "ItemInCartSection") {
-                currentCart = NSKeyedUnarchiver.unarchiveObject(with: data) as? [CartModel]
-                for(key, value) in (currentCart?.enumerated())! {
+                productCartModel = NSKeyedUnarchiver.unarchiveObject(with: data) as? [CartModel]
+                for(key, value) in (productCartModel?.enumerated())! {
                     
                     if value.id ==  "\(item.id)" {
-                        currentCart?.remove(at: Int(key))
+                        productCartModel?.remove(at: Int(key))
                         cardButton.setTitleColor(.black, for: .normal)
                         cardButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 12)
                         cardButton.layer.borderWidth = 2
@@ -359,13 +362,13 @@ class SingleProductVC: UIViewController {
                         SVProgressHUD.showSuccess(withStatus: "تم ازاله المنتج")
                                          SVProgressHUD.dismiss(withDelay: 0.7)
                         cardButton.setTitle("Cart", for: .normal)
-                        let data = NSKeyedArchiver.archivedData(withRootObject: currentCart!)
+                        let data = NSKeyedArchiver.archivedData(withRootObject: productCartModel!)
                         UserDefaults.standard.set(data, forKey: "ItemInCartSection")
                         UserDefaults.standard.synchronize()
                     } 
                 }
                 
-                searchView.cardButton.badgeString = ""
+                searchView.cardButton.badgeString = "\(productCartModel.count - 1)"
 
             }
             

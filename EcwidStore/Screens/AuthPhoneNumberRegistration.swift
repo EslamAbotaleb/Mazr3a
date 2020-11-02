@@ -148,7 +148,7 @@ class AuthPhoneNumberRegistration: UIViewController, UITextFieldDelegate {
 
             } else {
                 print("unable to get verifation code\(error!.localizedDescription)")
-                SVProgressHUD.showSuccess(withStatus: error!.localizedDescription)
+                SVProgressHUD.showError(withStatus: error!.localizedDescription)
                                  SVProgressHUD.dismiss(withDelay: 0.7)
             }
         }
