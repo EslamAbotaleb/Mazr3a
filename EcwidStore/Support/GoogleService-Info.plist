@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>149202843844-kmr3sjjb02eum4jmht08a8cceio05au9.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.149202843844-kmr3sjjb02eum4jmht08a8cceio05au9</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCmfNXDVXo-gkTl_4d8-OvlNJEIJ8k4y1o</string>
+	<key>GCM_SENDER_ID</key>
+	<string>149202843844</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.logista.elmazr3a</string>
+	<key>PROJECT_ID</key>
+	<string>mazr3a-bcb9d</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mazr3a-bcb9d.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:149202843844:ios:df5f406c1d9f1e3f88b191</string>
+	<key>DATABASE_URL</key>
+	<string>https://mazr3a-bcb9d.firebaseio.com</string>
+</dict>
+</plist>
