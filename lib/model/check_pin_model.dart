@@ -1,4 +1,6 @@
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
 // To parse this JSON data, do
 
 CheckPinModel checkPinModelFromJson(String str) => CheckPinModel.fromJson(json.decode(str));
@@ -7,8 +9,8 @@ String checkPinModelToJson(CheckPinModel data) => json.encode(data.toJson());
 
 class CheckPinModel {
     CheckPinModel({
-        this.statusCode,
-        this.statusMessage,
+       @required this.statusCode,
+        @required this.statusMessage,
         this.user,
     });
 
@@ -19,7 +21,7 @@ class CheckPinModel {
     factory CheckPinModel.fromJson(Map<String, dynamic> json) => CheckPinModel(
         statusCode: json["statusCode"],
         statusMessage: json["statusMessage"],
-        user: User.fromJson(json["user"]),
+        user:  json["user"] == null ? null :  User.fromJson(json["user"]),
     );
 
     Map<String, dynamic> toJson() => {

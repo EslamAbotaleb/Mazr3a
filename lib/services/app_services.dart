@@ -298,6 +298,7 @@ class AppServices {
       if (response.statusCode == 200) {
         final CheckPinModel resultPinCode =
             checkPinModelFromJson(response.body);
+            print(resultPinCode.statusMessage);
         print('YesFoundPinCodes');
         print(resultPinCode);
         return APIResponse<CheckPinModel>(data: resultPinCode);

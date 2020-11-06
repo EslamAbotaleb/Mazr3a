@@ -1,16 +1,24 @@
 import 'dart:async';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:primaxproject/common/debouncer.dart';
+import 'package:primaxproject/common/language.dart';
+import 'package:primaxproject/common/my_connectivity.dart';
 import 'package:primaxproject/localization/demo_localization.dart';
+import 'package:primaxproject/localization/localization_constants.dart';
 import 'package:primaxproject/model/api_response.dart';
 import 'package:primaxproject/model/show_topic_model.dart';
 import 'package:primaxproject/res/sizeconfig.dart';
 import 'package:primaxproject/res/textsytlewidget/text_style.dart';
 import 'package:primaxproject/res/themeApp/themeprimax.dart';
 import 'package:primaxproject/services/app_services.dart';
+import 'package:primaxproject/widgets/common_widget/common_widget.dart';
 import 'package:primaxproject/widgets/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
+
+import '../../../main.dart';
 
 class SearchWidget extends StatefulWidget {
   final _searchQuery = new TextEditingController();
@@ -24,9 +32,11 @@ class SearchWidget extends StatefulWidget {
 class _SearchWidgetState extends State<SearchWidget>
     with SingleTickerProviderStateMixin {
   APIResponse<ShowTopicModel> getResultAfterUserSearchAboutTopic;
-
+  Map _source = {ConnectivityResult.none: false};
+  MyConnectivity _connectivity = MyConnectivity.instance;
   bool selected = false;
   bool _isLoading = false;
+
   var connected = false;
   String keyword;
   bool upDown = true;
@@ -56,6 +66,10 @@ class _SearchWidgetState extends State<SearchWidget>
       parent: _controller,
       curve: new Interval(0.0, 1.0, curve: Curves.linear),
     );
+    _connectivity.initialise();
+    _connectivity.myStream.listen((source) {
+      setState(() => _source = source);
+    });
   }
 
   _fetchDataWhenUserSearchAboutTopic(String keyword) async {
@@ -100,6 +114,92 @@ class _SearchWidgetState extends State<SearchWidget>
 
   @override
   Widget build(BuildContext context) {
+    switch (_source.keys.toList()[0]) {
+      case ConnectivityResult.none:
+        print("ErrorConnection");
+        return Scaffold(
+          body: Center(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 150,
+              child: Center(
+                  child: Column(
+                children: [
+                  Text('Connection Failed'),
+                  SizedBox(height: 25.0),
+                  Container(
+                    child: RaisedButton(
+                      color: Colors.black,
+                      textColor: Colors.white,
+                      onPressed: () {
+                        if (_source.keys.toList()[0] ==
+                            ConnectivityResult.mobile) {
+                          return buildScaffoldWidget(context);
+                        } else if (_source.keys.toList()[0] ==
+                            ConnectivityResult.wifi) {
+                          return buildScaffoldWidget(context);
+                        } else if (_source.keys.toList()[0] ==
+                            ConnectivityResult.none) {
+                          DisplayMessage.displayToast(
+                              'Still connection failed');
+                        }
+                      },
+                      child: Text('Check connection'),
+                    ),
+                  ),
+                ],
+              )),
+            ),
+          ),
+        );
+        break;
+      case ConnectivityResult.mobile:
+        print("MobileConnection");
+
+        return buildScaffoldWidget(context);
+        break;
+      case ConnectivityResult.wifi:
+        print("WifiConnection");
+
+        return buildScaffoldWidget(context);
+        break;
+    }
+    return buildScaffoldWidget(context);
+  }
+
+//   Future<Locale> setLocale(String languageCode) async {
+//   SharedPreferences _prefs = await SharedPreferences.getInstance();
+//   await _prefs.setString(Language_Code, languageCode);
+//   return _locale(languageCode);
+// }
+// Locale _locale(String language) {
+//    Locale _temp;
+//     switch (language) {
+//       case English:
+//       _temp = Locale(language, 'US');
+//       break;
+//       case Arabic:
+//             _temp = Locale(language, 'SA');
+//       break;
+
+// }
+// return _temp;
+// }
+  void _chanageLanguage(Language language) async {
+    print(language.languageCode);
+    Locale _temp = await setLocale(language.languageCode);
+    MyApp.setLocale(context, _temp);
+
+    // switch (language.languageCode) {
+    //   case 'en':
+    //   _temp = Locale(language.languageCode, 'US');
+    //   break;
+    //   case 'ar':
+    //         _temp = Locale(language.languageCode, 'SA');
+    //   break;
+  }
+
+  Scaffold buildScaffoldWidget(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
       // drawer: Theme(
@@ -169,7 +269,8 @@ class _SearchWidgetState extends State<SearchWidget>
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(
-                                   DemoLocalization.of(context).getTransaltedValue('Search'),
+                                    DemoLocalization.of(context)
+                                        .getTransaltedValue('Search'),
                                     style: AppTextStyle
                                         .titleStyleHeaderSectionSearchBar,
                                   ),
@@ -178,8 +279,8 @@ class _SearchWidgetState extends State<SearchWidget>
                                     maxLines: 1,
                                     decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        hintText:
-                                          DemoLocalization.of(context).getTransaltedValue('SerachBy')),
+                                        hintText: DemoLocalization.of(context)
+                                            .getTransaltedValue('SerachBy')),
                                     onChanged: textChanged,
                                   ),
                                 ],
@@ -210,18 +311,48 @@ class _SearchWidgetState extends State<SearchWidget>
             ),
             actions: [
               Padding(
-                padding: EdgeInsets.all(8.0),
-                child: IconButton(
-                    icon: Icon(
-                      Icons.search,
-                      color: Colors.orange,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _oepnSearchBarContainer();
-                      });
-                    }),
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton(
+                  onChanged: (Language language) {
+                    _chanageLanguage(language);
+                  },
+                  items: Language.languageList()
+                      .map<DropdownMenuItem<Language>>((lang) =>
+                          DropdownMenuItem(
+                            value: lang,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  lang.name,
+                                  // style: TextStyle(
+                                  //     fontSize: 12),
+                                ),
+                                Text(lang.flag)
+                              ],
+                            ),
+                          ))
+                      .toList(),
+                  underline: SizedBox(),
+                  icon: Icon(
+                    Icons.language,
+                    color: Colors.orange,
+                  ),
+                ),
               ),
+              // Padding(
+              //   padding: EdgeInsets.all(8.0),
+              //   child: IconButton(
+              //       icon: Icon(
+              //         Icons.search,
+              //         color: Colors.orange,
+              //       ),
+              //       onPressed: () {
+              //         setState(() {
+              //           _oepnSearchBarContainer();
+              //         });
+              //       }),
+              // ),
             ],
           ),
           SliverList(
@@ -327,10 +458,8 @@ class _SearchWidgetState extends State<SearchWidget>
                                           width:
                                               // MediaQuery.of(context).size.width,
                                               SizeConfigs.screenWidth,
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.22,
+                                          height:
+                                              SizeConfigs.screenHeight * 0.18,
                                           child: Stack(children: [
                                             Positioned(
                                                 left: SizeConfigs.screenWidth *
@@ -402,6 +531,12 @@ class _SearchWidgetState extends State<SearchWidget>
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _connectivity.disposeStream();
+    super.dispose();
   }
 
   void _oepnSearchBarContainer() {

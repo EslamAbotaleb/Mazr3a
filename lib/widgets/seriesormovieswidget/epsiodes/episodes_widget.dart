@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get_it/get_it.dart';
 import 'package:primaxproject/autorotate/auto_rotate.dart';
 import 'package:primaxproject/model/episodes.dart';
@@ -7,6 +6,7 @@ import 'package:primaxproject/res/sizeconfig.dart';
 import 'package:primaxproject/res/themeApp/themeprimax.dart';
 import 'package:primaxproject/services/app_services.dart';
 import 'package:primaxproject/ui/pages/chewiePlayer/chewie_player.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../widgets.dart';
@@ -135,16 +135,35 @@ class _SeeEpisodesWidgetState extends State<EpisodesWidget> {
                                 width: SizeConfig.blockSizeHorizontal * 45,
                                 height: 210.0,
                                 //  SizeConfig.blockSizeVertical * 23,
-                                child: CachedNetworkImage(
-                                  imageUrl:
-                                      'http://vod.appcorp.mobi/storage/' +
-                                          widget?.listEpisodes[positon]?.videoCover,
-                                  fit: BoxFit.fill,
-                                  placeholder: (context, url) =>
-                                      CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      new Icon(Icons.error),
+                                child:
+                                //  CachedNetworkImage(
+                                //   imageUrl:
+                                //       'http://vod.appcorp.mobi/storage/' +
+                                //           widget?.listEpisodes[positon]?.videoCover,
+                                //   fit: BoxFit.fill,
+                                //   placeholder: (context, url) =>
+                                //       CircularProgressIndicator(),
+                                //   errorWidget: (context, url, error) =>
+                                //       new Icon(Icons.error),
+                                // ),
+                                  Stack(
+                            children: [
+                                 Positioned(
+                                  left: SizeConfigs.screenWidth * 0.158,
+                                  top: SizeConfigs.screenWidth * 0.158,
+                                  child:  Icon(Icons.error)),
+                            Center(
+                              child: Container(
+                                width: SizeConfigs.imageSizeMultiplier * 45,
+                                height: SizeConfigs.screenHeight * 0.25,
+                                child: FadeInImage.memoryNetwork(
+                                  placeholder: kTransparentImage,
+                                  image: 'http://vod.appcorp.mobi/storage/' +
+                                      widget?.listEpisodes[positon]?.videoCover,
                                 ),
+                              ),
+                            ),
+                          ]),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(10.0),

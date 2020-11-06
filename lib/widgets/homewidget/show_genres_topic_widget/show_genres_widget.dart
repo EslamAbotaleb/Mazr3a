@@ -193,7 +193,7 @@ class _ShowGenresTopicWidgetState extends State<ShowGenresTopicWidget> {
       height: _apiResponse?.data?.results[position]?.mediaList?.length == 0
           ? 0.0
           : DemoLocalization.of(context).locale.languageCode == 'en'
-              ? SizeConfigs.screenHeight * 0.31
+              ? SizeConfigs.screenHeight * 0.309
               : SizeConfigs.screenHeight * 0.325,
       width: SizeConfigs.screenWidth,
       child: ListView.builder(
@@ -301,7 +301,7 @@ class _ShowGenresTopicWidgetState extends State<ShowGenresTopicWidget> {
                             Center(
                               child: Container(
                                 width: SizeConfigs.imageSizeMultiplier * 45,
-                                height: SizeConfigs.screenHeight * 0.25,
+                                height: SizeConfigs.screenHeight * 0.24,
                                 child: FadeInImage.memoryNetwork(
                                   placeholder: kTransparentImage,
                                   image: 'http://vod.appcorp.mobi/storage/' +
@@ -333,7 +333,7 @@ class _ShowGenresTopicWidgetState extends State<ShowGenresTopicWidget> {
                           fit: BoxFit.fitWidth,
                           child: Padding(
                             padding: EdgeInsets.all(
-                                2.7 * SizeConfigs.widthMultiplier),
+                                2.2 * SizeConfigs.widthMultiplier),
                             child: Text(
                               DemoLocalization.of(context).locale.languageCode == 'en'
                               ?

@@ -63,16 +63,16 @@ class _DrawerContentState extends State<DrawerContent> {
     setState(() {
       prefs.remove('mobileNumber');
       prefs.remove('operatorCode');
-      if (prefs.getBool('isLoggedIn')) {
-        prefs.remove('isLoggedIn');
+      // if (prefs.getBool('isLoggedIn')) {
+      //   prefs.remove('isLoggedIn');
         DisplayMessage.displayToast('Logout Successfully');
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (BuildContext ctx) => SubscriptionScreen()));
-      } else {
-        // DisplayMessage.displayToast('Must subscribe to logout');
-      }
+      // } else {
+      //   // DisplayMessage.displayToast('Must subscribe to logout');
+      // }
     });
   }
 

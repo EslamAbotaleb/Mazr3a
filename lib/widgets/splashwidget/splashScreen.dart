@@ -133,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void startTimer() {
     Timer(Duration(seconds: 3), () {
       // navigateUser(); //It will redirect  after 3 seconds
-       checkSubscription();
+        checkSubscription();
       //  Navigator.pushReplacement(context,
       //     MaterialPageRoute(builder: (BuildContext context) => HomePage()));
     });
@@ -173,20 +173,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
       // MARK:- user become subscriber
       // DisplayMessage.displayToast('successVerification');
-
-      var status = prefs.getBool('isLoggedIn') ?? false;
-      print(status);
-      if (status) {
-        print('statusistrue');
-        Navigator.pushReplacement(context,
+ Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (BuildContext context) => HomePage()));
-      } else {
-        print('statusisfalse');
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) => SubscriptionScreen()));
-      }
+      // var status = prefs.getBool('isLoggedIn') ?? false;
+      // print(status);
+      // if (status) {
+      //   print('statusistrue');
+      //   Navigator.pushReplacement(context,
+      //       MaterialPageRoute(builder: (BuildContext context) => HomePage()));
+      // } else {
+      //   print('statusisfalse');
+      //   Navigator.pushReplacement(
+      //       context,
+      //       MaterialPageRoute(
+      //           builder: (BuildContext context) => SubscriptionScreen()));
+      // }
     } else  if (_checkSubscriptionResponse.data.subscriptionStatus == 'unsubscriber') {
       print('user unsubscriber');
       Navigator.pushReplacement(
@@ -204,9 +205,17 @@ class _SplashScreenState extends State<SplashScreen> {
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => SubscriptionScreen()));
+
     } else if (_checkSubscriptionResponse.data.statusMessage == 'Invalid MSISDN.') {
       DisplayMessage.displayToast('Please insert valid phone number');
 
+    } else{
+      print("gkeropgeuoregjerjgeijgerjerigjreig");
+      print(_checkSubscriptionResponse.data.statusMessage);
+       Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => SubscriptionScreen()));
     }
     // else if (_checkSubscriptionResponse.data.statusMessage ==
     //     'User not exists.') {

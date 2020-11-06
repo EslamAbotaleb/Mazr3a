@@ -92,7 +92,9 @@ class _SendPinCodeWidgetState extends State<SendPinCodeWidget> {
   }
 
   void navigatePage() {
-    DisplayMessage.displayToast('Verified');
+
+   
+       DisplayMessage.displayToast('Verified');
 
     Navigator.push(
       context,
@@ -105,6 +107,8 @@ class _SendPinCodeWidgetState extends State<SendPinCodeWidget> {
         // DrawerContent(mobileNumber: widget.mobileNumber, operatorCode: widget.idOperator,),
       ),
     );
+    
+   
   }
 
   startTime() async {
@@ -239,12 +243,19 @@ class _SendPinCodeWidgetState extends State<SendPinCodeWidget> {
                               'Please insert your pin code');
                         } else {
                           setState(() {
+
                             _fetchPinCodeWhenUserInsertRightPin(
                                 widget.addPinCode.text);
                           });
+//  if (_apiResponse.data.statusMessage == "Invalid Pin Code.") {
+//       DisplayMessage.displayToast('Please insert valid pin code');
+//       print('gejghregheirghierhgerigherigherighergrgreerg');
+//     } else {
+//       print("fewjfiejoiehgeioregyr");
+                                startTime();
 
+    // }
                           // Navigator.pop(context);
-                          startTime();
                         }
                       },
                       child: Row(

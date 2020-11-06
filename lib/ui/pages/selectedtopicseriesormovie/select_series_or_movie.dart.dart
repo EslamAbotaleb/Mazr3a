@@ -113,7 +113,7 @@ class _SelectedTopicSeriesOrMovieState
             ? 
             // MARK:- get movies by page number
             await service.getShowTopicSerivce(pageNumber, 'get/movies/by-page')
-            :  widget?._apiResponse = await service.getTopTen();
+            :  
            
     setState(() {
       _isLoading = false;
@@ -133,6 +133,7 @@ class _SelectedTopicSeriesOrMovieState
     DateTime dateTime = dateFormat.parse(releaseDate);
 
     SizeConfig().init(context);
+    
     switch (_source.keys.toList()[0]) {
       case ConnectivityResult.none:
         print("ErrorConnection");

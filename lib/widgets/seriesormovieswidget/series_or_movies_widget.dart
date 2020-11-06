@@ -77,7 +77,7 @@ class _SeeSeasonsOrRelatedMoviesWidgetState
           _scrollController.position.maxScrollExtent) {
         widget.type == 'series'
             ? service
-                .getShowTopicSerivce(pageNumber + 1, 'get/all/series-paginate')
+                .getShowTopicSerivce(pageNumber + 1, 'get/series/by-page')
                 .then((value) {
                 pageNumber = value?.data?.pageNumber;
                 setState(() {
@@ -86,7 +86,7 @@ class _SeeSeasonsOrRelatedMoviesWidgetState
                 });
               })
             : service
-                .getShowTopicSerivce(pageNumber + 1, 'get/all/movies-paginate')
+                .getShowTopicSerivce(pageNumber + 1, 'get/movies/by-page')
                 .then((value) {
                 pageNumber = value?.data?.pageNumber;
                 setState(() {
@@ -116,8 +116,8 @@ class _SeeSeasonsOrRelatedMoviesWidgetState
 
   @override
   Widget build(BuildContext context) {
-
-    print(widget?._apiResponse?.data?.results?.length);
+      print('gerjglrejlrejglrieghjerighreg');
+      print(widget.type);
     return widget.type == 'series'
         ? Padding(
             padding: EdgeInsets.only(
